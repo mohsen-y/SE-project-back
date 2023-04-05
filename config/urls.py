@@ -38,4 +38,5 @@ urlpatterns = [
         name="schema-swagger-ui",
     ),
     path(route="admin/", view=admin.site.urls),
+    path(route="users/", view=include("users.urls")),
 ]
