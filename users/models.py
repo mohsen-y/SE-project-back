@@ -67,6 +67,12 @@ class User(AbstractUser):
         blank=True,
         null=True,
     )
+    address = models.CharField(
+        verbose_name="address",
+        max_length=255,
+        blank=True,
+        null=True,
+    )
     role = models.CharField(
         max_length=1,
         choices=Role.choices,
