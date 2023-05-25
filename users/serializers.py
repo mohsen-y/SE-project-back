@@ -5,7 +5,7 @@ from typing import Dict
 
 
 class UserRegisterSerializer(serializers.Serializer):
-    email = serializers.EmailField(required=False, allow_null=True)
+    email = serializers.EmailField(required=True, allow_null=False)
     phone = serializers.CharField(
         required=False,
         validators=[
@@ -37,10 +37,6 @@ class UserRegisterSerializer(serializers.Serializer):
         return phone
 
     def validate(self, data: Dict) -> Dict:
-        if not data.get("email", None) and not data.get("phone", None):
-            raise serializers.ValidationError(
-                detail="Enter either a valid email address or phone number to register."
-            )
         if data.get("password") != data.get("password_confirm"):
             raise serializers.ValidationError(
                 detail="Passwords do not match."
