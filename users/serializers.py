@@ -46,3 +46,17 @@ class UserRegisterSerializer(serializers.Serializer):
     def create(self, validated_data: Dict) -> models.User:
         validated_data.pop("password_confirm")
         return models.User.objects.create_user(**validated_data)
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.User
+        exclude = [
+            "password",
+            "is_superuser",
+            "is_staff",
+            "is_active",
+            "groups",
+            "user_permissions",
+        ]
+        read_only_fields = ["id"]
