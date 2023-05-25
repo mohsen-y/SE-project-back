@@ -8,25 +8,22 @@ from django.db import models
 class UserManager(DefaultUserManager):
     use_in_migrations = True
 
-    def _create_user(self, password, email=None, phone=None, **extra_fields):
+    def _create_user(self, email, password, phone=None, **extra_fields):
         """
-        Create and save a user with the given email, phone, and password.
+        Create and save a user with the given username, email, and password.
         """
-        if not email and not phone:
-            raise ValueError("One of the email or phone must be set")
-        if email:
-            email = self.normalize_email(email)
+        email = self.normalize_email(email)
         user = self.model(email=email, phone=phone, **extra_fields)
         user.password = make_password(password)
         user.save(using=self._db)
         return user
 
-    def create_user(self, email=None, phone=None, password=None, **extra_fields):
+    def create_user(self, email=None, password=None, phone=None, **extra_fields):
         extra_fields.setdefault("is_staff", False)
         extra_fields.setdefault("is_superuser", False)
-        return self._create_user(password=password, email=email, phone=phone, **extra_fields)
+        return self._create_user(email=email, password=password, phone=phone, **extra_fields)
 
-    def create_superuser(self, email=None, phone=None, password=None, **extra_fields):
+    def create_superuser(self, email=None, password=None, phone=None, **extra_fields):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
 
@@ -35,21 +32,25 @@ class UserManager(DefaultUserManager):
         if extra_fields.get("is_superuser") is not True:
             raise ValueError("Superuser must have is_superuser=True.")
 
-        return self._create_user(password=password, email=email, phone=phone, **extra_fields)
+        return self._create_user(email=email, password=password, phone=phone, **extra_fields)
 
 
 class User(AbstractUser):
+    class Gender(models.TextChoices):
+        OWNER = "M", "Male"
+        ADMIN = "F", "Female"
+
     class Role(models.TextChoices):
         OWNER = "O", "Owner"
         ADMIN = "A", "Admin"
         CUSTOMER = "C", "Customer"
-    
+
     username = None
     email = models.EmailField(
         verbose_name="email address",
         unique=True,
-        blank=True,
-        null=True,
+        blank=False,
+        null=False,
     )
     phone = models.CharField(
         verbose_name="phone number",
@@ -74,9 +75,11 @@ class User(AbstractUser):
         null=True,
     )
     role = models.CharField(
-        max_length=1,
+        max_length=8,
         choices=Role.choices,
         default=Role.CUSTOMER,
+        blank=False,
+        null=False,
     )
 
     objects = UserManager()
