@@ -1,3 +1,4 @@
+from django.contrib.auth.password_validation import validate_password
 from django.core.validators import RegexValidator
 from rest_framework import serializers
 from users import models
@@ -35,6 +36,10 @@ class UserRegisterSerializer(serializers.Serializer):
                 detail="A user is already registered with this phone number."
             )
         return phone
+
+    def validate_password(self, password: str) -> str:
+        validate_password(password=password)
+        return password
 
     def validate(self, data: Dict) -> Dict:
         if data.get("password") != data.get("password_confirm"):
