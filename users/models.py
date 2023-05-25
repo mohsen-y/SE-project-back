@@ -2,7 +2,9 @@ from django.contrib.auth.models import UserManager as DefaultUserManager
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
+from django.utils import timezone
 from django.db import models
+from config import settings
 
 
 class UserManager(DefaultUserManager):
@@ -86,3 +88,12 @@ class User(AbstractUser):
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
+
+
+class OTP(models.Model):
+    user = models.ForeignKey("User", on_delete=models.CASCADE, blank=False, null=False)
+    code = models.CharField(max_length=6, blank=False, null=False)
+    updated_at = models.DateTimeField(auto_now=True, blank=False, name=False)
+
+    def is_valid(self):
+        return ((timezone.now() - self.updated_at).seconds / 60) < settings.OTP_EXPIRES_MINUTES

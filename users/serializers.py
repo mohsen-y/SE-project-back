@@ -53,7 +53,7 @@ class UserRegisterSerializer(serializers.Serializer):
         return models.User.objects.create_user(**validated_data)
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserListSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.User
         exclude = [
@@ -65,3 +65,24 @@ class UserSerializer(serializers.ModelSerializer):
             "user_permissions",
         ]
         read_only_fields = ["id"]
+
+
+class SendOTPSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True, allow_null=False)
+
+
+class ResetPasswordSerializer(SendOTPSerializer):
+    code = serializers.CharField(required=True)
+    password = serializers.CharField(min_length=8, required=True)
+    password_confirm = serializers.CharField(min_length=8, required=True)
+
+    def validate_password(self, password: str) -> str:
+        validate_password(password=password)
+        return password
+
+    def validate(self, data: Dict) -> Dict:
+        if data.get("password") != data.get("password_confirm"):
+            raise serializers.ValidationError(
+                detail="Passwords do not match."
+            )
+        return data
