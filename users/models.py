@@ -72,7 +72,7 @@ class User(AbstractUser):
     )
     address = models.CharField(
         verbose_name="address",
-        max_length=255,
+        max_length=1023,
         blank=True,
         null=True,
     )
@@ -82,6 +82,20 @@ class User(AbstractUser):
         default=Role.CUSTOMER,
         blank=False,
         null=False,
+    )
+    zip_code = models.CharField(
+        verbose_name="zip code",
+        max_length=15,
+        unique=True,
+        blank=True,
+        null=True,
+    )
+    national_id = models.CharField(
+        verbose_name="national ID",
+        max_length=15,
+        unique=True,
+        blank=True,
+        null=True,
     )
 
     objects = UserManager()

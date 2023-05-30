@@ -5,7 +5,24 @@ from users import models
 from typing import Dict
 
 
-class UserRegisterSerializer(serializers.Serializer):
+class ChangePasswordSerializer(serializers.Serializer):
+    password = serializers.CharField(min_length=8, required=True)
+    password_confirm = serializers.CharField(min_length=8, required=True)
+
+    def validate_password(self, password: str) -> str:
+        validate_password(password=password)
+        return password
+
+    def validate(self, data: Dict) -> Dict:
+        if data.get("password") != data.get("password_confirm"):
+            raise serializers.ValidationError(
+                detail="Passwords do not match."
+            )
+        return data
+
+
+class UserCreateSerializer(ChangePasswordSerializer):
+    id = serializers.IntegerField(read_only=True)
     email = serializers.EmailField(required=True, allow_null=False)
     phone = serializers.CharField(
         required=False,
@@ -37,17 +54,6 @@ class UserRegisterSerializer(serializers.Serializer):
             )
         return phone
 
-    def validate_password(self, password: str) -> str:
-        validate_password(password=password)
-        return password
-
-    def validate(self, data: Dict) -> Dict:
-        if data.get("password") != data.get("password_confirm"):
-            raise serializers.ValidationError(
-                detail="Passwords do not match."
-            )
-        return data
-
     def create(self, validated_data: Dict) -> models.User:
         validated_data.pop("password_confirm")
         return models.User.objects.create_user(**validated_data)
@@ -67,22 +73,31 @@ class UserListSerializer(serializers.ModelSerializer):
         read_only_fields = ["id"]
 
 
+class UserUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.User
+        exclude = [
+            "last_login",
+            "password",
+            "is_superuser",
+            "is_staff",
+            "is_active",
+            "groups",
+            "user_permissions",
+            "date_joined",
+            "role",
+        ]
+        read_only_fields = ["id"]
+
+    def __init__(self, instance=None, data=..., **kwargs):
+        super().__init__(instance, data, **kwargs)
+
+        self.fields["email"].required = False
+
+
 class SendOTPSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True, allow_null=False)
 
 
-class ResetPasswordSerializer(SendOTPSerializer):
+class ResetPasswordSerializer(ChangePasswordSerializer, SendOTPSerializer):
     code = serializers.CharField(required=True)
-    password = serializers.CharField(min_length=8, required=True)
-    password_confirm = serializers.CharField(min_length=8, required=True)
-
-    def validate_password(self, password: str) -> str:
-        validate_password(password=password)
-        return password
-
-    def validate(self, data: Dict) -> Dict:
-        if data.get("password") != data.get("password_confirm"):
-            raise serializers.ValidationError(
-                detail="Passwords do not match."
-            )
-        return data

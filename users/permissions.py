@@ -16,3 +16,8 @@ class IsAdmin(BasePermission):
             return True
 
         return False
+
+
+class IsUserCreator(BasePermission):
+    def has_object_permission(self, request, view, obj: models.User):
+        return obj.id == request.user.id
