@@ -1,8 +1,9 @@
-from rest_framework.generics import CreateAPIView, ListAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView, UpdateAPIView
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth.hashers import make_password
-from rest_framework.permissions import AllowAny
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.response import Response
+from users.permissions import IsUserCreator
 from rest_framework.request import Request
 from rest_framework.views import APIView
 from django.core.mail import send_mail
@@ -11,7 +12,7 @@ from rest_framework import status
 import random
 
 class UserCreateAPIView(CreateAPIView):
-    serializer_class = serializers.UserRegisterSerializer
+    serializer_class = serializers.UserCreateSerializer
     permission_classes = [AllowAny]
 
 
@@ -19,6 +20,24 @@ class UserListAPIView(ListAPIView):
     queryset = models.User.objects.all()
     serializer_class = serializers.UserListSerializer
     permission_classes = [AllowAny]
+
+
+class UserUpdateAPIView(UpdateAPIView):
+    queryset = models.User.objects.all()
+    serializer_class = serializers.UserUpdateSerializer
+    permission_classes = [IsAuthenticated, IsUserCreator]
+
+
+class ChangePasswordAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(request_body=serializers.ChangePasswordSerializer)
+    def put(self, request: Request, format=None):
+        serializer = serializers.ChangePasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        request.user.password = make_password(serializer.data.get("password"))
+        request.user.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class SendOTPAPIView(APIView):
