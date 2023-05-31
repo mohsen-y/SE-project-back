@@ -38,14 +38,10 @@ class UserManager(DefaultUserManager):
 
 
 class User(AbstractUser):
-    class Gender(models.TextChoices):
-        OWNER = "M", "Male"
-        ADMIN = "F", "Female"
-
     class Role(models.TextChoices):
-        OWNER = "O", "Owner"
-        ADMIN = "A", "Admin"
-        CUSTOMER = "C", "Customer"
+        OWNER = "owner"
+        ADMIN = "admin"
+        CUSTOMER = "customer"
 
     username = None
     email = models.EmailField(
