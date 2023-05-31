@@ -72,3 +72,27 @@ class Product(models.Model):
         null=False,
     )
     # TODO: Rating
+
+
+class Comment(models.Model):
+    product = models.ForeignKey(
+        to="Product",
+        on_delete=models.CASCADE,
+        blank=False,
+        null=False,
+    )
+    author = models.ForeignKey(
+        to="users.User",
+        on_delete=models.CASCADE,
+        blank=False,
+        null=False,
+    )
+    message = models.TextField(
+        blank=False,
+        null=False,
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        blank=False,
+        null=False,
+    )
