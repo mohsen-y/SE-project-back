@@ -39,6 +39,7 @@ class UserCreateSerializer(ChangePasswordSerializer):
     )
     password = serializers.CharField(min_length=8, write_only=True, required=True)
     password_confirm = serializers.CharField(min_length=8, write_only=True, required=True)
+    role = serializers.ChoiceField(choices=models.User.Role.choices, required=False)
 
     def validate_email(self, email: str) -> str:
         if models.User.objects.filter(email__exact=email).exists():
