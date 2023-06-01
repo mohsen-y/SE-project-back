@@ -101,7 +101,7 @@ class User(AbstractUser):
 
 
 class OTP(models.Model):
-    user = models.ForeignKey("User", on_delete=models.CASCADE, blank=False, null=False)
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE, blank=False, null=False)
     code = models.CharField(max_length=6, blank=False, null=False)
     updated_at = models.DateTimeField(auto_now=True, blank=False, name=False)
 
