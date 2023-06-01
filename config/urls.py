@@ -16,7 +16,6 @@ Including another URLconf
 from django.urls import re_path, path, include
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
-from django.contrib import admin
 from drf_yasg import openapi
 
 
@@ -37,6 +36,6 @@ urlpatterns = [
         view=schema_view.with_ui(),
         name="schema-swagger-ui",
     ),
-    path(route="admin/", view=admin.site.urls),
     path(route="users/", view=include("users.urls")),
+    path(route="products/", view=include("products.urls")),
 ]
