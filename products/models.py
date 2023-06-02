@@ -1,3 +1,4 @@
+from users.models import User
 from django.db import models
 
 
@@ -76,13 +77,13 @@ class Product(models.Model):
 
 class Comment(models.Model):
     product = models.ForeignKey(
-        to="Product",
+        to=Product,
         on_delete=models.CASCADE,
         blank=False,
         null=False,
     )
     author = models.ForeignKey(
-        to="users.User",
+        to=User,
         on_delete=models.CASCADE,
         blank=False,
         null=False,
