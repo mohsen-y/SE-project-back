@@ -1,6 +1,8 @@
 from rest_framework.generics import CreateAPIView, ListAPIView, UpdateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.authtoken.views import ObtainAuthToken
 from django.contrib.auth.hashers import make_password
+from rest_framework.authtoken.models import Token
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.response import Response
 from users.permissions import IsUserCreator
@@ -98,3 +100,26 @@ class ResetPasswordAPIView(APIView):
         user.password = make_password(serializer.data.get("password"))
         user.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ObtainAuthTokenAPIView(ObtainAuthToken):
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token, created = Token.objects.get_or_create(user=user)
+        data = {
+            "id": user.pk,
+            "last_login": user.last_login,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "date_joined": user.date_joined,
+            "email": user.email,
+            "phone": user.phone,
+            "address": user.address,
+            "role": user.role,
+            "zip_code": user.zip_code,
+            "national_id": user.national_id,
+            "token": token.key,
+        }
+        return Response(data=data)
