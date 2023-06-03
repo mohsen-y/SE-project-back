@@ -38,14 +38,10 @@ class UserManager(DefaultUserManager):
 
 
 class User(AbstractUser):
-    class Gender(models.TextChoices):
-        OWNER = "M", "Male"
-        ADMIN = "F", "Female"
-
     class Role(models.TextChoices):
-        OWNER = "O", "Owner"
-        ADMIN = "A", "Admin"
-        CUSTOMER = "C", "Customer"
+        OWNER = "owner"
+        ADMIN = "admin"
+        CUSTOMER = "customer"
 
     username = None
     email = models.EmailField(
@@ -72,7 +68,7 @@ class User(AbstractUser):
     )
     address = models.CharField(
         verbose_name="address",
-        max_length=255,
+        max_length=1023,
         blank=True,
         null=True,
     )
@@ -83,6 +79,20 @@ class User(AbstractUser):
         blank=False,
         null=False,
     )
+    zip_code = models.CharField(
+        verbose_name="zip code",
+        max_length=15,
+        unique=True,
+        blank=True,
+        null=True,
+    )
+    national_id = models.CharField(
+        verbose_name="national ID",
+        max_length=15,
+        unique=True,
+        blank=True,
+        null=True,
+    )
 
     objects = UserManager()
 
@@ -91,7 +101,7 @@ class User(AbstractUser):
 
 
 class OTP(models.Model):
-    user = models.ForeignKey("User", on_delete=models.CASCADE, blank=False, null=False)
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE, blank=False, null=False)
     code = models.CharField(max_length=6, blank=False, null=False)
     updated_at = models.DateTimeField(auto_now=True, blank=False, name=False)
 
