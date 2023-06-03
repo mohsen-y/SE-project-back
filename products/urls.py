@@ -3,8 +3,8 @@ from products import views
 
 
 urlpatterns = [
-    path(route="create/", view=views.ProductCreateAPIView.as_view()),
-    path(route="list/", view=views.ProductListAPIView.as_view()),
+    path(route="create/", view=views.ProductCreateAPIView.as_view(), name="create"),
+    path(route="list/", view=views.ProductListAPIView.as_view(), name = "list"),
     path(route="<int:pk>/", view=views.ProductRetrieveAPIView.as_view()),
     path(route="<int:pk>/update/", view=views.ProductUpdateAPIView.as_view()),
     path(route="<int:pk>/delete/", view=views.ProductDestroyAPIView.as_view()),
